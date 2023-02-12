@@ -57,7 +57,7 @@ int sthIdontknow(char b, char k) {
     return b;
 }
 ```
-Bài này ta xét hàm `check_key(char *)` có `key` là input mình nhập vào, `sth[]` và mySth[]. Vòng while, Hàm sthIdontknow sẽ được truyền từng phần tử của `sth[]` và input của mình nhập, rồi sau đó `xor` với mySth, bắt buộc phải bằng 0 để vòng while có thể thực hiện tiếp, do đó `sthIdontknow()` sẽ phải trả về mảng giống với `mySth[]`.
+Bài này ta xét hàm `check_key(char *)` có `key` là input mình nhập vào, `sth[]` và mySth[]. Vòng while, Hàm `sthIdontknow()` sẽ được truyền từng phần tử của `sth[]` và input của mình nhập, rồi sau đó `xor` với `mySth[]`, bắt buộc phải bằng 0 để vòng while có thể thực hiện tiếp, do đó `sthIdontknow()` sẽ phải trả về mảng giống với `mySth[]`.
 Xét hàm `sthIdontknow()` đơn giản so sánh từng bit của kí tự hiện tại của `sth[]` và input mình nhập vào, nếu giống thì chuyển thành 0 khác thì chuyển thành 1, ta có thể thấy nó là một phép `xor`, do đó muốn tìm flag ta chỉ cần lấy `mySth[]` xor với `pearldarkk` sẽ ra được flag 
 # script
 ```python
