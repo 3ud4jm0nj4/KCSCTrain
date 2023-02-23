@@ -32,7 +32,7 @@ Vậy nên `v7=0x13^0xDEADBEEF=0xDEADBEFC` và cho vào hàm `decrypt()`.
 
 ![decrypt](./decrypt.png)
 
-Hàm này cũng có hàm tính kích thước của chính nó và hàm check `Debug()`, nhưng hàm này không có byte nào là 0xCC, nên hàm `checkDebug()` sẽ trả về 0x37 nếu ta không đặt software breakpoint ở bất kí chỗ nào trong hàm. Vậy nên `v7=0x37+0xDEADBEFC= 0xDEADBF33`
+Hàm này cũng có hàm tính kích thước của chính nó và hàm check `Debug()`, nhưng hàm này không có byte nào là 0xCC, nên hàm `checkDebug()` sẽ trả về 0x37 nếu ta không đặt software breakpoint ở bất kì chỗ nào trong hàm. Vậy nên `v7=0x37+0xDEADBEFC= 0xDEADBF33`
 Sau đó chương trình sẽ tạo key 512 kí tự và `xor` với `flag`. Rồi quay lại hàm main và so sánh với mảng v11 đã khởi tạo giá trị ban đầu. Vậy nên ta chỉ cần tạo lại key và `xor` lại với v11 sẽ ra flag
 # Script
 ```python
