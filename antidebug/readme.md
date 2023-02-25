@@ -8,7 +8,7 @@ Bài này được viết theo kiểu PE32
 Load vào ida thấy có Hàm `TlsCallback_0` 
 ### TLSCallback
 TLS(Thread Local Storage) là một cơ chế được cung cấp bởi các hệ điều hành để cho phép các luồng riêng lẻ trong 1 chương trình đa luồng có không gian lưu trữ dữ liệu riêng của chúng. Mỗi luồng có thể sử dụng khu vực TLS riêng cho luồng, như các tùy chọn cấu hình dành riêng cho luồng, handle, hoặc những cấu trúc dữ liệu của luồng.Hàm `TLSCallback` được gọi bởi kernel Windows khi TLS index của thread được sử dụng lần đầu tiên để truy cập bộ nhớ cục bộ của luồng. Hàm này thường được dùng để khởi tạo dữ liệu TLS cho luồng, thường liên quan đến việc cấp phát bộ nhớ và khởi tạo cấu trúc dữ liệu. Do đó nó sẽ luôn chạy trước hàm main của chúng ta. 
-Chúng ta cũng có thể xem entry point của hàm trong IDA ta ấn `Ctrl+E`:
+Chúng ta cũng có thể xem entry point trong IDA ta ấn `Ctrl+E`:
 
 ![EntryPoint](./img/EntryPoint.png) 
 
@@ -16,7 +16,7 @@ Ta cũng thấy được rằng địa chỉ của `TlsCallback_0` nằm trướ
 
 ![flowTLS](./img/flowTLS.png)
 
-Đây là flow của hàm `TlsCallback_0`. Ta có thể thấy đầu tiên hàm sẽ gọi Hàm [`IsDebuggerPresent`](https://anti-debug.checkpoint.com/techniques/debug-flags.html#using-win32-api-isdebuggerpresent), cái tên của hàm cũng đã nói lên nhiệm vụ của nó rồi. Hàm này đơn giản là chỉ check cở BeingDebugged ở trong [PEB](https://www.nirsoft.net/kernel_struct/vista/PEB.html) xem chương trình có đang bị debug hay không, nếu không thì nó sẽ lấy `ProcessId` của chương trình đang chạy và sẽ dùng hàm `WriteProcessMemory` để  sửa 4 btye code tại `offset loc_4013A2+1`. Còn nếu thấy được chúng ta đang debug thì chương trình sẽ nhảy thẳng tới hàm main và không modify code nữa.
+Đây là flow của hàm `TlsCallback_0`. Ta có thể thấy đầu tiên hàm sẽ gọi Hàm [`IsDebuggerPresent`](https://anti-debug.checkpoint.com/techniques/debug-flags.html#using-win32-api-isdebuggerpresent), cái tên của hàm cũng đã nói lên nhiệm vụ của nó rồi. Hàm này đơn giản là chỉ check cở BeingDebugged ở trong [PEB](https://www.nirsoft.net/kernel_struct/vista/PEB.html) xem chương trình có đang bị debug hay không, nếu không thì nó sẽ lấy `ProcessId` của chương trình đang chạy và sẽ dùng hàm `WriteProcessMemory` để  sửa 4 btye code tại `offset loc_4013A2+1`. Còn nếu thấy debug thì chương trình sẽ nhảy thẳng tới hàm main. Vì thế tí nữa chúng ta sẽ xem chương trình sửa code như nào.
 ### Main
 Tạm thời bỏ qua, ta sẽ xem hàm main:
 
