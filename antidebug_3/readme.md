@@ -106,11 +106,9 @@ Bỏ qua kí tự 64, hàm này lấy 4 byte kí tự từ 65-68 xor với 4 byt
 
 ![fake.png](./img/fake.png)
 
-
-Đây là mã giả của hàm, nếu theo flow này chúng ta sẽ bị sai. Sau đó sẽ nhảy vào hàm `sub_CB1190` và tính toán nốt 30 kí tự cuối
-
-
 ## Kí tự 70 đến 99
+
+Sau đó sẽ nhảy vào hàm `sub_CB1190` và tính toán nốt 30 kí tự cuối
 
 ![70-99.png](./img/70-99.png)
 
