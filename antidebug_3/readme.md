@@ -18,7 +18,7 @@ Hàm này thường được dùng để xử lý ngoại lệ, nếu có lỗi 
 
 Sau đó sửa EIP đến địa chỉ của hàm `TopLevelExceptionFilter` - `0x00CC14C0`, sau khi vào hàm ta thấy được một đoạn dữ liệu, ta có thể ấn `C` để `Make Code` thì ta được như này: 
 
-![topFlow](./img/topFlow.png)
+![topFlow](./img/topFlow1.png)
 
 ### PEBDebug
 
@@ -78,7 +78,7 @@ Hàm tính toán 12 kí tự, sau đó lại cộng lên 13 kí tự và bỏ qu
 
 ![40-57](./img/40-57.png)
 
-Hàm xor 2 byte flag 1 với 2 byte `0xBEEF` ta đã tính toán được lúc đầu.Tính toán 18 kí tự, rồi cộng lên 19 kí tự bỏ qua kí tự 58
+Hàm xor lần lượt từng 2 byte flag với 2 byte `0xBEEF` ta đã tính toán được lúc đầu.Tính toán 18 kí tự, rồi cộng lên 19 kí tự bỏ qua kí tự 58
 
 ## Kí tự 59-63 & 65-68
 
@@ -86,7 +86,7 @@ Sau đó nhảy đến hàm `sub_CB11D0`. Đây là flow của hàm:
 
 ![int3int2d.png](./img/int3int2d.png)
 
-Hàm này có hai chỗ để check debug [`int 2dh`](https://anti-debug.checkpoint.com/techniques/assembly.html#int2d) và [`int 3`](https://anti-debug.checkpoint.com/techniques/assembly.html#int3) ( mình đã đặt breapoint màu đỏ, cơ chế hàm này cũng giống `SetUnhanledExceptionFilter()` ban đầu, nếu trong block `ms_exc.registration.TryLevel` có xảy ra ngoại lệ thì sẽ ngay lập tức nhảy đến hàm `ms_exc.old_esp`, còn nếu chúng ta debug thì ngoại lệ sẽ gửi thẳng đến debugger và không thể xử lý, nếu chúng ta cố chấp debug tiếp chúng ta sẽ đi vào `block` màu vàng, thì sẽ bị sai. 
+Hàm này có hai chỗ để check debug [`int 2dh`](https://anti-debug.checkpoint.com/techniques/assembly.html#int2d) và [`int 3`](https://anti-debug.checkpoint.com/techniques/assembly.html#int3) ( mình đã đặt breapoint màu đỏ), cơ chế hàm này cũng giống `SetUnhanledExceptionFilter()` ban đầu, nếu trong block `ms_exc.registration.TryLevel` có xảy ra ngoại lệ thì sẽ ngay lập tức nhảy đến hàm `ms_exc.old_esp`, còn nếu chúng ta debug thì ngoại lệ sẽ gửi thẳng đến debugger và không thể xử lý, nếu chúng ta cố chấp debug tiếp chúng ta sẽ đi vào `block` màu vàng, thì sẽ bị sai. 
 
 ![59-63](./img/59-63.png)
 
@@ -97,14 +97,18 @@ for i in range(59,64,1):
     arr[i]=((arr[i]>>j) & 0xff) | ((arr[i]<<(8-j))& 0xff)
     j+=1
 ```
+Bỏ qua kí tự 64, hàm này lấy 4 byte kí tự từ 65-68 xor với 4 byte `0xFE13317`
 
 ![65-69.png](./img/65-69.png)
 
-Bỏ qua kí tự 64, hàm này lấy 4 byte kí tự từ 65-68 xor với 4 byte `0xFE13317`
+
+Đây là mã giả của hàm, nếu theo flow này chúng ta sẽ bị sai.
 
 ![fake.png](./img/fake.png)
 
+
 Đây là mã giả của hàm, nếu theo flow này chúng ta sẽ bị sai. Sau đó sẽ nhảy vào hàm `sub_CB1190` và tính toán nốt 30 kí tự cuối
+
 
 ## Kí tự 70 đến 99
 
