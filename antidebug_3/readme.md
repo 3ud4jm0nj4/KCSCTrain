@@ -12,11 +12,11 @@ Load vào ida và bắt đầu từ hàm main:
 
 ### [SetUnhanledExceptionFilter()](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-setunhandledexceptionfilter)
 
-Hàm này thường được dùng để xử lý ngoại lệ, nếu có lỗi nào thì chương trình sẽ gọi một trình gỡ lỗi để xử lý, nhưng nếu đang chạy trong debug, thì trình gỡ lỗi sẽ không được gọi mà chuyển thẳng đến debugger. Nhưng trong bài này, tác giả đang dùng hàm này và cố tình tạo ra lỗi để nhảy đến hàm [`TopLevelExceptionFilter`](https://anti-debug.checkpoint.com/techniques/exceptions.html#unhandledexceptionfilter). Vì lỗi sẽ bị chuyển đến debugger nên trước khi xảy ra lỗi ta sẽ sửa EIP để nhảy đến hàm `TopLevelExceptionFilter`. Đây là đoạn code sẽ tạo ra lỗi chia 0, nên ta sẽ đặt breakpoint ngay tại câu lệnh `idiv`:
+Hàm này thường được dùng để xử lý ngoại lệ, nếu có lỗi nào thì chương trình sẽ gọi một trình gỡ lỗi để xử lý, nhưng nếu đang chạy trong debug, thì trình gỡ lỗi sẽ không được gọi mà chuyển thẳng đến debugger. Nhưng trong bài này, tác giả đang dùng hàm này và cố tình tạo ra lỗi để nhảy đến hàm [`TopLevelExceptionFilter`](https://anti-debug.checkpoint.com/techniques/exceptions.html#unhandledexceptionfilter). Vì lỗi sẽ bị chuyển đến debugger nên trước khi xảy ra lỗi ta sẽ sửa EIP để nhảy đến hàm `TopLevelExceptionFilter`. Đây là đoạn code sẽ tạo ra lỗi chia 0:
 
 ![Errordiv0](./img/Error.png)
 
-Sau đó sửa EIP đến địa chỉ của hàm `TopLevelExceptionFilter` - `0x00CC14C0`, sau khi vào hàm ta thấy được một đoạn dữ liệu, ta có thể ấn `C` để `Make Code` thì ta được như này: 
+Ta vào thẳng hàm `TopLevelExceptionFilter` - `0x00CC14C0`, sau khi vào hàm ta thấy được một đoạn dữ liệu, ta có thể ấn `C` để `Make Code` thì ta được như này: 
 
 ![topFlow](./img/topFlow1.png)
 
