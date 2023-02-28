@@ -26,7 +26,7 @@ Lênh `mov eax, large fs:30h` sẽ lấy địa chỉ của PEB trong [TIB](http
 
 ![0xAB](./img/0xAB.png)
 
-Còn biến `byte_CB4083` chỉ phụ thuộc vào `v4` check xem `v3` đã đúng địa chỉ của PEB chưa thôi, nên luôn trả về `0xCD`.Mình sẽ rename tên biến `byte_CB4082` thành `isAB` và `byte_CB4083` thành `isCD` cho dễ nhớ và đây là mã giả của hàm: 
+Còn biến `byte_CB4083` phụ thuộc vào `v4` check xem `v3` đã đúng địa chỉ của PEB chưa thôi, và Check [`NtGlobalFlag`](https://anti-debug.checkpoint.com/techniques/debug-flags.html#manual-checks-ntglobalflag), nếu không debug thì sẽ là `0xCD`.Mình sẽ rename tên biến `byte_CB4082` thành `isAB` và `byte_CB4083` thành `isCD` cho dễ nhớ và đây là mã giả của hàm: 
 
 ![pseutopFlow1.png](./img/pseutopFlow1.png)
 
