@@ -22,7 +22,7 @@ Sau đó sửa EIP đến địa chỉ của hàm `TopLevelExceptionFilter` - `0
 
 ### PEBDebug
 
-Lệnh này sẽ lấy địa chỉ của PEB trong [TIB](https://en.wikipedia.org/wiki/Win32_Thread_Information_Block) (Thread Information Block ),  `fs:30h` là địa chỉ của PEB, ta thấy có 2 biến `byte_CB4082` và `byte_CB4083` sẽ được khởi tạo ở đầu chương trình, Biến `byte_CB4082` được tạo bằng cách check xem chương trình có debug hay không sử dụng `BeingDebugged` trong cấu trúc [PEB](https://processhacker.sourceforge.io/doc/ntpebteb_8h_source.html), như vậy nếu không debug sẽ trả về `0xAB`: 
+Lênh `mov eax, large fs:30h` sẽ lấy địa chỉ của PEB trong [TIB](https://en.wikipedia.org/wiki/Win32_Thread_Information_Block) (Thread Information Block ),  `fs:30h` là địa chỉ của PEB, ta thấy có 2 biến `byte_CB4082` và `byte_CB4083` sẽ được khởi tạo ở đầu chương trình, Biến `byte_CB4082` được tạo bằng cách check xem chương trình có debug hay không sử dụng `BeingDebugged` trong cấu trúc [PEB](https://processhacker.sourceforge.io/doc/ntpebteb_8h_source.html), như vậy nếu không debug sẽ trả về `0xAB`: 
 
 ![0xAB](./img/0xAB.png)
 
