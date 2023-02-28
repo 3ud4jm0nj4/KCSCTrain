@@ -112,7 +112,7 @@ Sau đó sẽ nhảy vào hàm `sub_CB1190` và tính toán nốt 30 kí tự cu
 
 ![70-99.png](./img/70-99.png)
 
-Hàm này xor kí tự hiện tại với kí tự đằng trước rồi trả ra kết quả
+Hàm này xor kí tự hiện tại với kí tự đằng trước.
 
 ## Check
 
