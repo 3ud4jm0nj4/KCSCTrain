@@ -224,7 +224,7 @@ Nhìn rất rối nhưng chúng ta có thể để ý có những đoạn `mov` 
 0x4006fa:    inc    eax
 0x4006fc:    jae    0x400706
 ```
-Nếu nhìn kĩ thì những dòng này vô nghĩa, không ảnh hưởng gì đến `eax` hay flow của chương trình, vì trước đó `eax` được lưu tạm tại nơi nào đó rồi lại trả lại giá trị, và các lệnh jump sẽ không bao giờ thỏa mãn, ví dụ lệnh `xor` sẽ set `SF=0` nên `jns` sẽ không nhảy được, hay `inc` sẽ set `CF=1` nên `jae` sẽ không nhảy nên ta sẽ xóa các lệnh đó.
+Nếu nhìn kĩ thì những dòng này vô nghĩa, không ảnh hưởng gì đến `eax` hay flow của chương trình, vì trước đó `eax` được lưu tạm tại nơi nào đó rồi lại trả lại giá trị, và mình đã debug thử thì tất cả các lệnh jump ở những dòng như này sẽ không bao giờ được kích hoạt.
 
 Vấn đề nữa của đoạn này là có những câu lệnh jmp vào những byte lẻ nhưng lại không có dòng đó mà lại thay vào một dòng rất khó hiểu thì ta sẽ dump lệnh ở địa chỉ đó ra. Ví dụ dòng này:
 
@@ -249,10 +249,10 @@ gef➤  x/s $rax
 ```
 Với những điều trên thì mình đã sửa lại hàm và comment cho dễ đọc:
 ```asm
-0x4006e5:    push   rbp
+   0x4006e5:    push   rbp
    0x4006e6:    mov    rbp,rsp
    0x4006e9:    call   0x400702
-   0x4006ee:    mov    cl,al
+   0x4006ee:    mov    cl,al			;nếu check thành công sẽ return eax =1
 
    0x4006fe:    mov    al,cl
    0x400700:    leave
@@ -295,10 +295,10 @@ Với những điều trên thì mình đã sửa lại hàm và comment cho d�
 
    0x4007a7:    jmp    0x400834
    0x4007ac:
-0x4007b1:    cmp    r11d,ecx            ;so sanh r11 voi do dai chuoi
-0x4007b4:    jl     0x4007b8            ;neu nho hon thi nhay den 7b8
-0x4007b6:    jmp    0x40074a            ;neu da dat den do dai chuoi ket thuc vong nhay den 74a
-0x4007b8:
+   0x4007b1:    cmp    r11d,ecx            ;so sanh r11 voi do dai chuoi
+   0x4007b4:    jl     0x4007b8            ;neu nho hon thi nhay den 7b8
+   0x4007b6:    jmp    0x40074a            ;neu da dat den do dai chuoi ket thuc vong nhay den 74a
+   0x4007b8:
    0x4007c6:    movsxd r10,r11d         ;mov 32bit to 64 bit, luu count do dai chuoi vao r10
 
    0x4007d5:    mov    rbx,rdx          ;rdx la dia chi cua chuoi mov rbx, offset flag
