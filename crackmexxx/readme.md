@@ -8,7 +8,7 @@ Bài là một file ELF-64bit
 
 ## IDA
 
-![main.png](./img/main.png]
+![main.png](./img/main.png)
 
 Load vào ida, vào hàm main ta thấy chương trình sửa dữ liệu tại hàm `sub_4006E5`:
 
@@ -24,7 +24,7 @@ Nhưng có lẽ chúng ta không cần quan tâm đến hàm này, vì chắc l�
 
 Oh no! Hàm được sửa nhưng mình cố gắng `Make Code` bằng ida thì luôn bị lẻ byte nên đọc không hiểu gì cả:
 
-[makecode.png](./img/makecode.png)
+![makecode.png](./img/makecode.png)
 
 Vì vậy mình sẽ thử debug bằng gdb xem có đọc được không. Đặt breakpoint tại `0x4006db` và chạy chương trình với tham số "3ud4jm0nj4"
 
@@ -218,22 +218,22 @@ gef➤  x/300i $rip
    0x40090b:    sub    al,0x0
 ```
 Nhìn rất rối nhưng chúng ta có thể để ý có những đoạn `mov` rồi `add` giá trị rất to vào eax rồi nhảy:
-```
+```asm
 0x4006f0:    mov    eax,0xae5fe432
 0x4006f5:    add    eax,0x51a01bce
 0x4006fa:    inc    eax
 0x4006fc:    jae    0x400706
 ```
-Nếu nhìn kĩ thì những dòng này vô nghĩa, không ảnh hưởng gì đến `eax` hay flow của chương trình, vì trước đó `eax` được lưu tạm tại nơi nào đó rồi lại trả lại giá trị, và các lệnh jump sẽ không bao giờ thỏa mãn, ví dụ lệnh `xor` sẽ set `SF` bằng không nên `jns` sẽ không nhảy được, hay `inc` sẽ set `CF=1` nên jae sẽ không nhảy nên ta sẽ xóa các lệnh đó.
+Nếu nhìn kĩ thì những dòng này vô nghĩa, không ảnh hưởng gì đến `eax` hay flow của chương trình, vì trước đó `eax` được lưu tạm tại nơi nào đó rồi lại trả lại giá trị, và các lệnh jump sẽ không bao giờ thỏa mãn, ví dụ lệnh `xor` sẽ set `SF=0` nên `jns` sẽ không nhảy được, hay `inc` sẽ set `CF=1` nên `jae` sẽ không nhảy nên ta sẽ xóa các lệnh đó.
 
-Vấn đề nữa của đoạn này là có những câu lệnh jmp vào những byte lẻ nhưng lại không có dòng đó mà lại thay vào một dòng rất khó đọc thì ta sẽ dump lệnh ở địa chỉ đó ra. Ví dụ dòng này:
+Vấn đề nữa của đoạn này là có những câu lệnh jmp vào những byte lẻ nhưng lại không có dòng đó mà lại thay vào một dòng rất khó hiểu thì ta sẽ dump lệnh ở địa chỉ đó ra. Ví dụ dòng này:
 
 ```asm
  0x4007ae:    jmp    0x4007af
  0x4007b0:    rol    BYTE PTR [rbx+rdi*1-0x27],0x7c
 ```
 Thì ta sẽ dump tại địa chỉ đó 
-```
+```asm
 gef➤  x/5i 0x4007af
    0x4007af:    inc    eax
    0x4007b1:    cmp    r11d,ecx
@@ -243,7 +243,7 @@ gef➤  x/5i 0x4007af
 ```
 Và với flag chúng ta nhập vào được lưu trong rax 
 
-```
+```asm
 gef➤  x/s $rax
 0x7fffffffdf4e: "3ud4jm0nj4"
 ```
@@ -372,7 +372,7 @@ Với những điều trên thì mình đã sửa lại hàm và comment cho d�
 Dòng `0x400780` gdb đã cho chúng ta biết `Cipher` để so sánh với flag được lưu tại `0x4008eb`, Và vì hàm chỉ sửa đến byte ở địa chỉ `0x40090c` nên mạnh dạn đoán flag sẽ gồm 33 kí tự ( `0x4008eb` đến `0x40090c` có 33 kí tự).
 
 Nếu bạn muốn biết mình đã xóa những gì thì hãy xem file [check.asm](./check.asm) mình đã để `comment` những dòng k cần thiết, hoặc vẫn thấy khó đọc thì đây là code python của hàm này mình đã viết lại:
-```
+```python
 r9b=0x50
 cipher = [0x48, 0x5f, 0x36, 0x35, 0x35, 0x25, 0x14, 0x2c, 0x1d, 0x01, 0x03, 0x2d,
         0x0c, 0x6f, 0x35, 0x61, 0x7e, 0x34, 0x0a, 0x44, 0x24, 0x2c, 0x4a, 0x46,
