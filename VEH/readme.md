@@ -2,7 +2,7 @@
 
 ## CFF Explorer
 
-![cff.png](./cff.png)
+![cff.png](./img/cff.png)
 
 Chương trình được viết theo kiểu PE64
 
@@ -30,15 +30,15 @@ Hàm này nếu chương trình xảy ra ngoại lệ chương trình sẽ nhả
 
 ![sub7ff.png](./img/sub7ff.png)
 
-Ta có thể thấy hàm so sánh lỗi tại địa chỉ của `ecx` với giá trị `0xC0000094` - đây là lỗi [chia không](https://learn.microsoft.com/vi-vn/previous-versions/troubleshoot/visualstudio/silverlight/application-exception-0xc0000094-vmware), sau khi tra hàm [AddVectoredExceptionHandler](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler), thì thấy được `ecx` ở đây chính là [EXCEPTION_POINTERS](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_pointers), và sẽ lấy giá trị `ExceptionCode` trong phần đầu tiên của phần [EXCEPTION_RECORD](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record) để so sánh với `0xC0000094`. Sau đó ta có thể thấy `EXCEPTION_POINTERS` được cộng thêm 8 để lấy địa chỉ của [CONTEXT struc](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context), phần này sẽ lưu giá trị những thanh ghi ngay tại thời điểm gặp exception, và sau khi hàm xử lý ngoại lệ thực hiện xong sẽ trả lại giá trị cho thanh ghi, vì vậy giá trị `(a1 + 8) + 120i64)` là thanh ghi `rax`, +184` là `r8`, `+192` là `r9` và `+248` là `rip` trong [CONTEXT struc](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context), chỗ này ta có thể khai báo lại kiểu dữ liệu của a1 thành `EXCEPTION_POINTERS` để ida tự xác định cho chúng ta:
+Ta có thể thấy hàm so sánh lỗi tại địa chỉ của `ecx` với giá trị `0xC0000094` - đây là code lỗi [chia không](https://learn.microsoft.com/vi-vn/previous-versions/troubleshoot/visualstudio/silverlight/application-exception-0xc0000094-vmware), sau khi đọc hàm [AddVectoredExceptionHandler](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-addvectoredexceptionhandler), thì biết được `ecx` ở đây chính là [EXCEPTION_POINTERS](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_pointers), và sẽ lấy giá trị `ExceptionCode` trong phần đầu tiên của phần [EXCEPTION_RECORD](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-exception_record) để so sánh với `0xC0000094`. Sau đó `EXCEPTION_POINTERS` được cộng thêm 8 để lấy địa chỉ của [CONTEXT struc](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context), phần này sẽ lưu giá trị những thanh ghi ngay tại thời điểm gặp exception, và sau khi hàm xử lý ngoại lệ thực hiện xong sẽ trả lại giá trị cho thanh ghi, vì vậy giá trị `(a1 + 8) + 120i64)` là thanh ghi `rax`, `+184` là `r8`, `+192` là `r9` và `+248` là `rip` trong [CONTEXT struc](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-context), chỗ này ta có thể `Y` khai báo lại kiểu dữ liệu của `a1` thành `EXCEPTION_POINTERS` để ida tự xác định cho chúng ta:
 
 ![redecle.png](./img/redecle.png)
 
-Như vậy tính khi gặp lỗi, chương trình sẽ resolve 1 api vào `rax` và tính từ câu lệnh ta gặp lỗi `rip` sẽ cộng thêm 4. Bởi vì hàm xử lý ngoại lệ này có check lỗi nên để bypass ta chỉ cần [patch](https://github.com/keystone-engine/keypatch) bỏ phần so sánh đi:
+Như vậy khi gặp lỗi, chương trình sẽ resolve api vào `rax` và tính từ câu lệnh ta gặp lỗi `rip` sẽ cộng thêm 4. Bởi vì hàm xử lý ngoại lệ này có check `ExceptionCode` nên để bypass ta chỉ cần [patch](https://github.com/keystone-engine/keypatch) bỏ phần so sánh đi:
 
 ![keypatch.png](./img/keypatch.png)
 
-Vậy cứ khi gặp `div rax`(dòng sẽ gặp lỗi chia 0) thì ta sẽ sửa `rip` nhảy vào hàm này là xong, hoặc ta có thể dùng script python sử dụng Appcall để gọi hàm `sub_7FF6F5661000` để resolve api vào `rax` và cộng `rip` lên 4.Script:
+Vậy cứ khi gặp `div rax`(dòng sẽ xảy ra lỗi chia 0) thì ta sẽ sửa `rip` nhảy vào hàm này là xong, hoặc ta có thể dùng script python sử dụng Appcall để gọi hàm `sub_7FF6F5661000` để resolve api vào `rax` và cộng `rip` lên 4.Script:
 ```python
 set_reg_value(Appcall.sub_7FF79E141000(get_reg_value("r8"),get_reg_value("r9")).value,"rax")
 set_reg_value(get_reg_value("rip") + 4,"rip" )
@@ -50,7 +50,7 @@ Ta thấy `rip` đã tăng thêm 4 và đã resovle được api vào `rax`. Ch�
 
 ![main.png](./img/main.png)
 
-Vậy mỗi khi chương trình chạy đến dòng `div rax` thì ra chạy script xem nó resolve ra hàm gì, và nhảy `rip` lên 4 để chương trình chạy đúng flow. Sau khi trace từng dòng 1 thì mình đã viết được hàm tương tự hàm `main` với C:
+Vậy tương tự như trên mỗi khi chương trình chạy đến dòng `div rax` thì ra chạy script xem nó resolve ra hàm gì, và nhảy `rip` lên 4 để chương trình chạy đúng flow. Sau khi trace từng dòng 1 thì mình đã viết được hàm tương tự hàm `main` với C:
 ```c
 #include <stdio.h>
 #include <windows.h>
