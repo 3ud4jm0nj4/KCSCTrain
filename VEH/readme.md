@@ -18,15 +18,15 @@ Chúng ta thấy có 3 hàm trong đoạn này, qua debug thì mình biết đư
 
 ![loadLib.png](./img/loadLib.png)
 
- Hàm `sub_7FF6F5661000` sẽ nhận vào 2 tham số `0C11AD5C5h` và `145370BBh` là giá trị hash của WinApi, chúng ta có thể tra mã hash này là hàm gì ở [đây](https://github.com/tildedennis/malware/blob/master/neutrino_bot_5.1/api_hashes), vậy chắc hàm này sẽ resolve WinApi từ PEB cho chúng ta: 
+ Hàm `sub_7FF6F5661000` sẽ nhận vào 2 tham số `0C11AD5C5h` và `145370BBh` là giá trị hash của WinApi, chúng ta có thể tra mã hash này là hàm gì ở [đây](https://github.com/tildedennis/malware/blob/master/neutrino_bot_5.1/api_hashes), hàm này sẽ resolve WinApi từ PEB cho chúng ta: 
 
 ![resolveApi.png](./img/resolveApi.png)
 
-Debug qua thử thì đúng hàm resolve ra `RtlAddVectoredExceptionHandler`:
+Debug qua thì resolve ra hàm `RtlAddVectoredExceptionHandler`:
 
 ![RtlVEH.png](./img/RtlVEH.png)
 
-Hàm này nếu chương trình xảy ra ngoại lệ chương trình sẽ nhảy đến hàm xử lý ngoại lệ, ở đây sẽ nhảy đến hàm `sub_7FF7E8FD11A0`:
+Hàm `RtlAddVectoredExceptionHandler` nếu chương trình xảy ra ngoại lệ chương trình sẽ nhảy đến hàm xử lý ngoại lệ, ở đây sẽ nhảy đến hàm `sub_7FF7E8FD11A0`:
 
 ![sub7ff.png](./img/sub7ff.png)
 
@@ -165,7 +165,7 @@ int main()
     return 0;
 }
 ```
-Tóm tắt lại là hàm sẽ dùng thuật toán mã hóa `AES` với key 32 Byte được tạo bằng cách hash `SHA_256` link [này](https://www.youtube.com/watch?v=dQw4w9WgXcQ), CBC mode và với Vectơ khởi tạo(IV) từ 1 đến 16, Rồi so sánh với `cipher[]`. Như vậy muốn decypt tìm flag ta chỉ cần gọi hàm `CryptDecrypt`
+Tóm tắt lại là hàm sẽ dùng thuật toán mã hóa `AES` với key 32 Byte được tạo bằng cách hash `SHA_256` link [này](https://www.youtube.com/watch?v=dQw4w9WgXcQ), CBC mode và với Vectơ khởi tạo(IV) từ 1 đến 16, sau đó so sánh với `cipher[]`. Như vậy muốn decypt tìm flag ta chỉ cần thay hàm `CryptEncrypt` bằng hàm `CryptDecrypt`
 ## script
 ```c
 #include <stdio.h>
