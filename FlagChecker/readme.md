@@ -4,7 +4,9 @@
 
 ![die.png](./img/die.png)
 
-File PE32, được pack bằng UPX 3.91, Compile bằng AutoIT
+* File PE32
+* Pack bằng UPX 3.91
+* Compile bằng AutoIT
 
 ## Unpack
 
@@ -30,7 +32,7 @@ Như vậy có thể đoạn Opcode kia có thể là hàm check `input`. Bây g
 
 ![antidbg.png](./img/antidbg.png)
 
-Chương trình ấn `OK` và xem thì ta thấy trong hàm `sub_D0445D` có đoạn check nếu chương trình đang được debug thì hiện ra `MessageBox` trên. Như vậy ta chỉ cần patch dòng jump sau khi `call IsDebuggerPresent` thành nop là chương trình sẽ chạy bình thường:
+Chương trình ấn `OK` và xem thì ta thấy trong hàm `sub_xx445D` có đoạn check nếu chương trình đang được debug thì hiện ra `MessageBox` trên. Như vậy ta chỉ cần patch dòng jump sau khi `call IsDebuggerPresent` thành nop là chương trình sẽ chạy bình thường:
 
 ![keyPatch.png](./img/keyPatch.png)
 
@@ -38,13 +40,13 @@ Chúng ta đặt tạm Breakpoint ở hàm vừa check debug và chạy lại ch
 
 ![findAPI.png](./img/findAPI.png)
 
-`F9` chạy tiếp chương trình, nhập flag, ta sẽ break tại hàm `CallWindowProcA`, trace qua từng dòng thì biết được `ebp+arg_0` là đoạn Opcode chúng ta cần tìm và `ebp+arg_4` là input. Chúng ta vào `ebp+arg_0` ấn `D` để lấy địa chỉ của Opcode, sử dụng chức năng `Make Code` để xem nó làm gì:
+`F9` chạy tiếp chương trình, nhập flag, ta sẽ break tại hàm `CallWindowProcA`, trace qua từng dòng thì biết được `ebp+arg_0` là đoạn Opcode chúng ta cần tìm và `ebp+arg_4` là input. Chúng ta vào `ebp+arg_0` ấn `D` để lấy địa chỉ của Opcode,vào địa chỉ đó sử dụng chức năng `Make Code` để xem nó làm gì:
 
 ![CallingConvention.png](./img/CallingConvention.png)
 
-Sau đó ta sẽ gặp những đoạn code như này. Ở đây tác giả sử dụng cơ chế của `Calling Convention` là khi gọi hàm thì sẽ đẩy `return address` lên stack, `return address` là địa chỉ ngay sau dòng lệnh gọi hàm để làm địa chỉ trả về sau khi thực hiện xong hàm đó. Nhưng ở đây tác giả đã gọi 1 hàm để đẩy dữ liệu lên stack và tiếp tục call 1 hàm ngay sau đoạn dữ liệu để lấy luôn đoạn dữ liệu đó làm tham số luôn. 
+Sau đó ta sẽ gặp những đoạn code như này. Ở đây tác giả sử dụng cơ chế của `Calling Convention` là khi gọi hàm thì sẽ đẩy `return address` lên stack, `return address` là địa chỉ ngay sau dòng lệnh gọi hàm để làm địa chỉ trả về sau khi thực hiện xong hàm đó. Nhưng ở đây tác giả đã call 1 hàm để đẩy dữ liệu lên stack và tiếp tục call 1 hàm ngay sau đoạn dữ liệu để lấy luôn đoạn dữ liệu đó làm tham số luôn. 
 
-Tiếp tục trace từng dòng cho đến hết đoạn Opcode đó thì mình viết lại được hàm đó trong code C, loại bỏ đi những cái không cần thiết thì hàm sẽ như này:
+Tiếp tục trace từng dòng cho đến hết đoạn so sánh thì mình viết lại được hàm đó bằng `C`, loại bỏ đi những chỗ không cần thiết thì hàm sẽ trông như này:
 
 ```c
 #include <stdio.h>
@@ -52,12 +54,12 @@ Tiếp tục trace từng dòng cho đến hết đoạn Opcode đó thì mình 
 #include <wincrypt.h>
 int CHECKER(char *RR){
 HCRYPTPROV hProv;
-if(!CryptAcquireContext(&hProv,NULL,NULL,PROV_RSA_FULL,0)){ //https://learn.microsoft.com/en-us/windows/win32/seccrypto/cryptographic-provider-types
+if(!CryptAcquireContext(&hProv,NULL,NULL,PROV_RSA_FULL,0)){ 
     printf("CryptAcquireContext failed: %d\n", GetLastError());
     return 1;
 } 
 HCRYPTHASH hHash ;
-if(!CryptCreateHash(hProv,CALG_SHA,0,0,&hHash)){ //https://learn.microsoft.com/en-us/windows/win32/seccrypto/alg-id
+if(!CryptCreateHash(hProv,CALG_SHA,0,0,&hHash)){ 
     printf("CryptCreateHash failed: %d \n", GetLastError());
 }
 DWORD len = strlen(RR);
@@ -110,7 +112,7 @@ int main(){
   CHECKER(key);
 }
 ```
-Hàm này sẽ sử dụng thư viện Crypt32.dll để mã hóa flag với thuật toán RC4, key là link [này](https://www.youtube.com/watch?v=dQw4w9WgXcQ) được hash SHA. Rồi sau đó so sánh với byte đã cho để check flag nhập có đúng không. Do đó ta chỉ cần thay hàm `CryptEncrypt()` bằng hàm `CryptDecrypt()` để ra flag. 
+Hàm này sẽ sử dụng thư viện Crypt32.dll để mã hóa flag với thuật toán RC4, key là link [này](https://www.youtube.com/watch?v=dQw4w9WgXcQ) được hash SHA. Rồi sau đó so sánh với byte đã cho để check flag . Do đó ta chỉ cần thay hàm `CryptEncrypt()` bằng hàm `CryptDecrypt()` để ra flag. 
 
 ## script
 
