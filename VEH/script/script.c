@@ -45,6 +45,7 @@ int EncFlag(char *flag){
   BYTE hihi [] = "aMicrosoft Enhanced RSA and AES Cryptographic Provider";
     HCRYPTPROV hProv;
 HCRYPTKEY hKey;
+DWORD dwDataLen = strlen(flag);
 if(!CryptAcquireContext(&hProv,NULL,NULL,PROV_RSA_AES,0)){
     printf("CryptAcquireContext failed: %d\n", GetLastError());
     return 1;
@@ -80,10 +81,8 @@ if (!CryptSetKeyParam(hKey, 1, pbIV, 0)) { //1=KP_IV
     CryptReleaseContext(hProv, 0);
     return 1;
 }
-DWORD lenFlag = 0x20;
- if (!CryptDecrypt(hKey, 0, TRUE, 0, flag, &lenFlag)) {
-        printf("Error %d during CryptDecrypt!\n", GetLastError());
-        return 0;
+ if (!CryptDecrypt(hKey, 0, TRUE, 0, flag, &dwDataLen)) {
+        return 1;
     }
 
 CryptDestroyKey(hKey);

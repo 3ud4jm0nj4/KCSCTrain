@@ -11,11 +11,8 @@ arr  = [0x74, 0x6F, 0x69, 0x35, 0x4F, 0x65, 0x6D, 0x32, 0x32, 0x79,
 
 for i in range(0,17,1):
     arr[i] ^=1
-
 for i in range(18,26,1):
     arr[i] ^= 0xAB
-
-
 j=0
 for i in range(27,39,1):
     a=(0xcd+j)&0xff
@@ -23,7 +20,6 @@ for i in range(27,39,1):
     arr[i]^=1
     arr[i]=arr[i]>>1
     j+=1
-
 for i in range(40,58,2):
     arr[i]^=0xEF
     arr[i+1]^=0xBE
@@ -42,6 +38,5 @@ i+=1
 arr[i]=arr[i]^0xc0
 for i in range(99,70,-1):
     arr[i]=arr[i-1]^arr[i]
-
 for i in range(len(arr)):
     print(chr(arr[i]),end="")
