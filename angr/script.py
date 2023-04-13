@@ -1,32 +1,26 @@
-import angr
-import claripy
+import angr, claripy
+target = angr.Project('a.out', auto_load_libs=False)
+input_len = 15
+inp = [claripy.BVS('flag_%d' %i, 8) for i in range(input_len)]
+flag = claripy.Concat(*inp + [claripy.BVV(b'\n')])
 
-FLAG_LEN = 15
-STDIN_FD = 0
+
+desired = 0x0010111d
+wrong = 0x00101100
+
+st = target.factory.full_init_state(args=["./a.out"], stdin=flag)
+for k in inp:
+    st.solver.add(k < 0x7f)
+    st.solver.add(k > 0x20)
 
 
+sm = target.factory.simulation_manager(st)
+sm.run()
+y = []
+for x in sm.deadended:
+    if b"SUCCESS" in x.posix.dumps(1):
+        y.append(x)
 
-proj = angr.Project('a.out', auto_load_libs=False)
-
-flag_chars = [claripy.BVS('flag_%d' % i, 8) for i in range(FLAG_LEN)]
-flag = claripy.Concat( *flag_chars + [claripy.BVV(b'\n')]) # Add \n for scanf() to accept the input
-
-state = proj.factory.full_init_state(
-        args=['./a.out'],
-        add_options=angr.options.unicorn,
-        stdin=flag,
-)
-
-# Add constraints that all characters are printable
-for k in flag_chars:
-    state.solver.add(k >= ord('!'))
-    state.solver.add(k <= ord('~'))
-
-simgr = proj.factory.simulation_manager(state)
-find_addr  = 0x0000111d # SUCCESS
-avoid_addr =0x00001100# FAILURE
-simgr.explore(find=find_addr, avoid=avoid_addr)
-
-if (len(simgr.found) > 0):
-    for found in simgr.found:
-        print(found.posix.dumps(STDIN_FD))
+#grab the first ouptut
+valid = y[0].posix.dumps(0)
+print(valid)
