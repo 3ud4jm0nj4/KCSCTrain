@@ -36,11 +36,11 @@ Sau đó `Binary Ninja` sẽ cho chúng ta hàm đó ở cả 2 dạng là 32 bi
 
 ![BinNin2.png](./img/BinNin2.png)
 
-Từ đó chúng ta có thể thấy được chương trình mã hoá flag của chúng ta bằng cách lấy từng kí tự `xor` với `0x7b` sau đó cộng với `0xd`. Sau đó chương trình lại chuyển lại về 32 bit: 
+Từ đó chúng ta có thể thấy được chương trình mã hoá flag của chúng ta bằng cách lấy từng kí tự `xor` với `0x7b` rồi cộng với `0xd`. Sau đó chương trình lại chuyển lại từ 64 bit về 32 bit(thực hiện tương tự như trên ): 
 
 ![heavengate2.png](./img/heavengate2.png)
 
-Sau đó chương trình sẽ check flag bằng cách so sánh flag của chúng ta sau khi được mã hoá với một đoạn cipher đã có sẵn. Nếu giống thì in ra `Accepted`, ngược lại in ra `Wrong!`:
+Tiếp theo chương trình sẽ check flag bằng cách so sánh flag của chúng ta sau khi được mã hoá với một đoạn cipher đã có sẵn. Nếu giống thì in ra `Accepted`, ngược lại in ra `Wrong!`:
 
 ![checkFlag.png](./img/checkFlag.png)
 
