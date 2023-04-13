@@ -36,7 +36,7 @@ Sau đó `Binary Ninja` sẽ cho chúng ta hàm đó ở cả 2 dạng là 32 bi
 
 ![BinNin2.png](./img/BinNin2.png)
 
-Từ đó chúng ta có thể thấy được chương trình mã hoá flag của chúng ta bằng cách lấy từng kí tự `xor` với `0x7b` rồi cộng với `0xd`. Sau đó chương trình lại chuyển lại từ 64 bit về 32 bit(thực hiện tương tự như trên ): 
+Từ đó chúng ta có thể thấy được chương trình mã hoá flag của chúng ta bằng cách lấy từng kí tự `xor` với `0x7b` rồi cộng với `0xd`. Sau đó chương trình lại chuyển lại từ 64 bit về 32 bit(thực hiện tương tự như trên với `0x23` là 32bit ): 
 
 ![heavengate2.png](./img/heavengate2.png)
 
