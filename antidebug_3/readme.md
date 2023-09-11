@@ -67,7 +67,7 @@ Mình sẽ viết lại hàm này với python
 j=0
 for i in range(27,39,1):
     a=(0xcd+j)&0xff
-    flag[i]=flag[i]>>1
+    flag[i]=flag[i]<<1
     flag[i]^=1
     flag[i]^=a  
     j+=1
@@ -97,7 +97,7 @@ for i in range(59,64,1):
     arr[i]=((arr[i]>>j) & 0xff) | ((arr[i]<<(8-j))& 0xff)
     j+=1
 ```
-Bỏ qua kí tự 64, hàm này lấy 4 byte kí tự từ 65-68 xor với 4 byte `0xFE13317`
+Bỏ qua kí tự 64, hàm này lấy 4 byte kí tự từ 65-68 xor với 4 byte `0x0xC0FE1337`
 
 ![65-69.png](./img/65-69.png)
 
